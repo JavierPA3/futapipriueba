@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Cargar el scaler y el modelo KMeans
-scaler = joblib.load('./modelos/clustering/scaler.pkl')
+# scaler = joblib.load('./modelos/clustering/scaler.pkl')
 kmeans = joblib.load('./modelos/clustering/ClusteringSimilarPlayersKM86.pkl')
 
 # Cargar los datos de jugadores
@@ -166,32 +166,32 @@ def predecir_def_dribbled_success():
     # Devolver la predicción como una respuesta JSON
     return jsonify({"expectedDribbles": prediccion.tolist()})
 
-@app.route('/searchSimilarPlayers', methods=['POST'])
-def buscar_jugadores_similares():
-    # Obtener los datos JSON del cuerpo de la solicitud
-    datos_jugador = request.json
+# @app.route('/searchSimilarPlayers', methods=['POST'])
+# def buscar_jugadores_similares():
+#     # Obtener los datos JSON del cuerpo de la solicitud
+#     datos_jugador = request.json
     
-    # Verificar si se proporcionaron datos válidos
-    if not datos_jugador:
-        return jsonify({'mensaje': 'No se han proporcionado datos válidos.'}), 400
+#     # Verificar si se proporcionaron datos válidos
+#     if not datos_jugador:
+#         return jsonify({'mensaje': 'No se han proporcionado datos válidos.'}), 400
     
-    # Convertir los datos del jugador en un DataFrame de pandas
-    jugador_datos_df = pd.DataFrame([datos_jugador])
+#     # Convertir los datos del jugador en un DataFrame de pandas
+#     jugador_datos_df = pd.DataFrame([datos_jugador])
 
-    # Seleccionar características del jugador
-    stats = ['PasTotCmp%', 'Goals', 'Shots', 'Assists', 'ScaDrib', 'TklWon', 'GcaDrib', 'Int', 'PasTotCmp', 'AerWon']
-    jugador_datos = jugador_datos_df[stats]
+#     # Seleccionar características del jugador
+#     stats = ['PasTotCmp%', 'Goals', 'Shots', 'Assists', 'ScaDrib', 'TklWon', 'GcaDrib', 'Int', 'PasTotCmp', 'AerWon']
+#     jugador_datos = jugador_datos_df[stats]
 
-    # Escalar los datos del jugador
-    jugador_datos_scaled = scaler.transform(jugador_datos)
+#     # Escalar los datos del jugador
+#     jugador_datos_scaled = scaler.transform(jugador_datos)
 
-    # Obtener el clúster del jugador
-    jugador_cluster = kmeans.predict(jugador_datos_scaled)[0]
+#     # Obtener el clúster del jugador
+#     jugador_cluster = kmeans.predict(jugador_datos_scaled)[0]
     
-    # Encontrar todos los jugadores en el mismo clúster
-    jugadores_similares = datos[datos['Cluster'] == jugador_cluster]['Player'].tolist()
+#     # Encontrar todos los jugadores en el mismo clúster
+#     jugadores_similares = datos[datos['Cluster'] == jugador_cluster]['Player'].tolist()
     
-    return jsonify({'searchSimilarPlayers': jugadores_similares})
+#     return jsonify({'searchSimilarPlayers': jugadores_similares})
 
 predictGCA = joblib.load('./modelos/prediccion/PrediccionGCA9999LR.pkl')
 
