@@ -1,24 +1,24 @@
+import os
 from flask import Flask, send_file, request, jsonify
 from flask_cors import CORS
 import pandas as pd
 import joblib
 import numpy as np
 
-
 app = Flask(__name__)
 CORS(app)
 
 # Cargar el scaler y el modelo KMeans
-# scaler = joblib.load('./modelos/clustering/scaler.pkl')
-# kmeans = joblib.load('./modelos/clustering/ClusteringSimilarPlayersKM86.pkl')
+scaler = joblib.load('./modelos/clustering/scaler.pkl')
+kmeans = joblib.load('./modelos/clustering/kmeans_model.pkl')
 
 # Cargar los datos de jugadores
 datos = pd.read_csv("conjunto_prueba.csv")
 
 # Asegurarse de que la columna 'Cluster' esté en los datos
 stats = ['PasTotCmp%', 'Goals', 'Shots', 'Assists', 'ScaDrib', 'TklWon', 'GcaDrib', 'Int', 'PasTotCmp', 'AerWon']
-# datos_scaled = scaler.transform(datos[stats])
-# datos['Cluster'] = kmeans.predict(datos_scaled)
+datos_scaled = scaler.transform(datos[stats])
+datos['Cluster'] = kmeans.predict(datos_scaled)
 
 @app.route('/getPlayers')
 def devolverJugadores():
@@ -34,7 +34,7 @@ def player_by_rk(rk):
     
     return jugador_datos.to_json(orient='records'), 200
 
-clasificationModel91 = joblib.load("./modelos/clasificacion/ClasificationModel91RFC.pkl")
+clasificationModel91 = joblib.load("./modelos/clasificacion/ClasificationModel91.pkl")
 
 @app.route('/predictPosition', methods=['POST'])
 def adivinaPosicion():
@@ -51,7 +51,7 @@ def adivinaPosicion():
 
     return jsonify({'posicion': posicion}), 200
 
-predictionXgoals = joblib.load('./modelos/prediccion/PredictionxG94_022RFR.pkl')
+predictionXgoals = joblib.load('./modelos/prediccion/PrediccionGolesDef9001.pkl')
 
 @app.route('/expectedGoals', methods=['POST'])
 def predecir_goles():
@@ -82,7 +82,7 @@ def predecir_goles():
         return jsonify({"error": "Las columnas necesarias no están presentes en los datos JSON."}), 400
 
 
-predictionXAssists = joblib.load('./modelos/prediccion/PredictionxA92_011RFR.pkl')
+predictionXAssists = joblib.load('./modelos/prediccion/PrediccionAssistDEF40.pkl')
 
 @app.route('/expectedAssists', methods=['POST'])
 def predecir_asistencias():
@@ -112,7 +112,7 @@ def predecir_asistencias():
     else:
         return jsonify({"error": "Las columnas necesarias no están presentes en los datos JSON."}), 400
 
-predicTionTkl = joblib.load('./modelos/prediccion/PrediccionTkl9999LR.pkl')
+predicTionTkl = joblib.load('./modelos/prediccion/PrediccionTkl99.pkl')
 
 @app.route('/expectedTackles', methods=['POST'])
 def predecir_tackles():
@@ -138,7 +138,7 @@ def predecir_tackles():
     return jsonify({"expectedTackles": prediccion.tolist()})
 
 # Cargar el modelo entrenado
-predictToSuc = joblib.load('./modelos/prediccion/PredicctionDribbled85_011LR.pkl')
+predictToSuc = joblib.load('./modelos/prediccion/DefDribbledENTR_85_011.pkl')
 
 @app.route('/expectedDribbles', methods=['POST'])
 def predecir_def_dribbled_success():
@@ -166,36 +166,36 @@ def predecir_def_dribbled_success():
     # Devolver la predicción como una respuesta JSON
     return jsonify({"expectedDribbles": prediccion.tolist()})
 
-# @app.route('/searchSimilarPlayers', methods=['POST'])
-# def buscar_jugadores_similares():
-#     # Obtener los datos JSON del cuerpo de la solicitud
-#     datos_jugador = request.json
+@app.route('/searchSimilarPlayers', methods=['POST'])
+def buscar_jugadores_similares():
+    # Obtener los datos JSON del cuerpo de la solicitud
+    datos_jugador = request.json
     
-#     # Verificar si se proporcionaron datos válidos
-#     if not datos_jugador:
-#         return jsonify({'mensaje': 'No se han proporcionado datos válidos.'}), 400
+    # Verificar si se proporcionaron datos válidos
+    if not datos_jugador:
+        return jsonify({'mensaje': 'No se han proporcionado datos válidos.'}), 400
     
-#     # Convertir los datos del jugador en un DataFrame de pandas
-#     jugador_datos_df = pd.DataFrame([datos_jugador])
+    # Convertir los datos del jugador en un DataFrame de pandas
+    jugador_datos_df = pd.DataFrame([datos_jugador])
 
-#     # Seleccionar características del jugador
-#     stats = ['PasTotCmp%', 'Goals', 'Shots', 'Assists', 'ScaDrib', 'TklWon', 'GcaDrib', 'Int', 'PasTotCmp', 'AerWon']
-#     jugador_datos = jugador_datos_df[stats]
+    # Seleccionar características del jugador
+    stats = ['PasTotCmp%', 'Goals', 'Shots', 'Assists', 'ScaDrib', 'TklWon', 'GcaDrib', 'Int', 'PasTotCmp', 'AerWon']
+    jugador_datos = jugador_datos_df[stats]
 
-#     # Escalar los datos del jugador
-#     jugador_datos_scaled = scaler.transform(jugador_datos)
+    # Escalar los datos del jugador
+    jugador_datos_scaled = scaler.transform(jugador_datos)
 
-#     # Obtener el clúster del jugador
-#     jugador_cluster = kmeans.predict(jugador_datos_scaled)[0]
+    # Obtener el clúster del jugador
+    jugador_cluster = kmeans.predict(jugador_datos_scaled)[0]
     
-#     # Encontrar todos los jugadores en el mismo clúster
-#     jugadores_similares = datos[datos['Cluster'] == jugador_cluster]['Player'].tolist()
+    # Encontrar todos los jugadores en el mismo clúster
+    jugadores_similares = datos[datos['Cluster'] == jugador_cluster]['Player'].tolist()
     
-#     return jsonify({'searchSimilarPlayers': jugadores_similares})
+    return jsonify({'jugadores_similares': jugadores_similares})
 
-predictGCA = joblib.load('./modelos/prediccion/PrediccionGCA9999LR.pkl')
+predictGCA = joblib.load('./modelos/prediccion/PrediccionGCA.pkl')
 
-@app.route('/expectedGCA', methods=['POST']) 
+@app.route('/buscarJugadoresGCA', methods=['POST']) 
 def buscar_jugadores_gca():
     # Obtener los datos JSON del cuerpo de la solicitud
     datos_jugador = request.json
@@ -222,8 +222,8 @@ def buscar_jugadores_gca():
     else:
         return jsonify({"error": "Las columnas necesarias no están presentes en los datos JSON."}), 400
 
-modeloRn = joblib.load('./modelos/clasificacion/ClasificationModel85RN.pkl')
-@app.route('/predictPositionRN', methods=['POST'])
+modeloRn = joblib.load('./modelos/clasificacion/modelo.pkl')
+@app.route('/adivinaPosicionRN', methods=['POST'])
 def adivinaPosicionRN():
     datos_jugador = request.json
     posiciones = ["Portero", "Defensa", "Mediocampista", "Delantero"]
@@ -238,7 +238,21 @@ def adivinaPosicionRN():
     prediccion = modeloRn.predict(datos_np)
     posicion = posiciones[np.argmax(prediccion, axis=1)[0]]
     return jsonify({'posicion': posicion}), 200
-                    
+
+def get_memory_usage():
+    process = psutil.Process(os.getpid())
+    memory_info = process.memory_info()
+    return memory_info.rss  # Resident Set Size (RSS) in bytes
+
+@app.route('/memory')
+def memory_usage():
+    memory = get_memory_usage()
+    return f'Current memory usage: {memory / (1024 ** 2):.2f} MB'
+
+@app.route('/memory2')
+def memory_usage2():
+    current, peak = tracemalloc.get_traced_memory()
+    return f'Current memory usage: {current / (1024 ** 2):.2f} MB, Peak: {peak / (1024 ** 2):.2f} MB'
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
