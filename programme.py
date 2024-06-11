@@ -10,15 +10,15 @@ CORS(app)
 
 # Cargar el scaler y el modelo KMeans
 # scaler = joblib.load('./modelos/clustering/scaler.pkl')
-kmeans = joblib.load('./modelos/clustering/ClusteringSimilarPlayersKM86.pkl')
+# kmeans = joblib.load('./modelos/clustering/ClusteringSimilarPlayersKM86.pkl')
 
 # Cargar los datos de jugadores
 datos = pd.read_csv("conjunto_prueba.csv")
 
 # Asegurarse de que la columna 'Cluster' esté en los datos
 stats = ['PasTotCmp%', 'Goals', 'Shots', 'Assists', 'ScaDrib', 'TklWon', 'GcaDrib', 'Int', 'PasTotCmp', 'AerWon']
-datos_scaled = scaler.transform(datos[stats])
-datos['Cluster'] = kmeans.predict(datos_scaled)
+# datos_scaled = scaler.transform(datos[stats])
+# datos['Cluster'] = kmeans.predict(datos_scaled)
 
 @app.route('/getPlayers')
 def devolverJugadores():
