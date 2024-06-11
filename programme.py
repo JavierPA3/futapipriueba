@@ -16,7 +16,7 @@ kmeans = joblib.load('./modelos/clustering/ClusteringSimilarPlayersKM86.pkl')
 datos = pd.read_csv("conjunto_prueba.csv")
 
 # Asegurarse de que la columna 'Cluster' esté en los datos
-stats = ['PasTotCmp%', 'Goals', 'Shots', 'Assi/sts', 'ScaDrib', 'TklWon', 'GcaDrib', 'Int', 'PasTotCmp', 'AerWon']
+stats = ['PasTotCmp%', 'Goals', 'Shots', 'Assists', 'ScaDrib', 'TklWon', 'GcaDrib', 'Int', 'PasTotCmp', 'AerWon']
 datos_scaled = scaler.transform(datos[stats])
 datos['Cluster'] = kmeans.predict(datos_scaled)
 
